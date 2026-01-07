@@ -43,6 +43,24 @@ if (electronIsDev) {
 
 // 1. Configura il logger
 autoUpdater.logger = console;
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = false;
+
+let isQuittingForUpdate = false;
+const forceQuitAndInstall = () => {
+  if (isQuittingForUpdate) return;
+  isQuittingForUpdate = true;
+
+  const mainWindow = myCapacitorApp.getMainWindow();
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.removeAllListeners('close');
+    mainWindow.removeAllListeners('closed');
+    mainWindow.destroy();
+  }
+
+  app.removeAllListeners('window-all-closed');
+  setImmediate(() => autoUpdater.quitAndInstall(false, true));
+};
 
 // 2. GESTIONE ERRORI
 autoUpdater.on('error', (error) => {
@@ -64,15 +82,7 @@ autoUpdater.on('update-downloaded', () => {
   }).then((result) => {
     // Se l'utente clicca il primo bottone (Riavvia Ora)
     if (result.response === 0) {
-      
-      // --- FIX IMPORTANTE PER MAC ---
-      // 1. Rimuoviamo i listener di chiusura per evitare blocchi
-      app.removeAllListeners('window-all-closed');
-      
-      // 2. Usiamo quitAndInstall con parametri specifici:
-      // isSilent: false (mostra finestre se serve)
-      // isForceRunAfter: true (forza il riavvio della nuova versione)
-      autoUpdater.quitAndInstall(false, true); 
+      forceQuitAndInstall();
     }
   });
 });
