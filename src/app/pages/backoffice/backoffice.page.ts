@@ -5,9 +5,10 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonSegment, IonSegmentButton, 
   IonLabel, IonList, IonItem, IonInput, IonButton, IonIcon, IonCard, IonCardContent,
   IonGrid, IonRow, IonCol, IonAvatar, IonSelect, IonSelectOption, 
-  IonTextarea, IonSearchbar, IonCardHeader, IonCardTitle
+  IonTextarea, IonSearchbar, IonCardHeader, IonCardTitle, IonLoading
 } from '@ionic/angular/standalone';
-import { DatabaseService, Startup, Guest, Employee, Reason, Supplier, ThirdParty } from 'src/app/services/database';
+import { DatabaseService } from 'src/app/services/database';
+import { Startup, Guest, Employee, Reason, Supplier, ThirdParty } from 'src/app/models/database.models';
 import { Observable, combineLatest, map, BehaviorSubject } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { trashOutline, businessOutline, peopleOutline, logOutOutline, cloudUploadOutline, personAddOutline, createOutline, arrowBackOutline, saveOutline, settingsOutline, cartOutline, briefcaseOutline, listOutline, eyeOutline, codeSlashOutline, listCircleOutline, informationCircleOutline, openOutline, documentTextOutline } from 'ionicons/icons';
@@ -23,7 +24,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/stor
     IonContent, IonHeader, IonTitle, IonToolbar, IonSegment, IonSegmentButton, 
     IonLabel, IonList, IonItem, IonInput, IonButton, IonIcon, IonCard, IonCardContent,
     IonGrid, IonRow, IonCol, IonAvatar, IonTextarea,
-    IonSearchbar, IonCardHeader, IonCardTitle
+    IonSearchbar, IonCardHeader, IonCardTitle, IonLoading
   ]
 })
 export class BackofficePage {
@@ -43,6 +44,8 @@ export class BackofficePage {
   privacyPdf: string = '';
   privacyPdfUrl: string = '';
   rawPrivacyPdf: File | null = null;
+  isBlockingLoading: boolean = false;
+  loadingMessage: string = '';
   
   //  STARTUP
 
@@ -270,6 +273,8 @@ async savePrivacyPdf() {
       alert('Nessun file PDF selezionato.');
       return;
     }
+    this.loadingMessage = 'Salvataggio PDF in corso...';
+    this.isBlockingLoading = true;
     try {
       // const pdfUrl = await this.dbService.privacyPdfUrl$ .toPromise();
       // const pdfUrl = await this.dbService.uploadFile(this.privacyPdf, 'config');
@@ -281,6 +286,8 @@ async savePrivacyPdf() {
     } catch (e) {
       console.error(e);
       alert('Errore nel salvataggio. Riprova.');
+    } finally {
+      this.isBlockingLoading = false;
     }
   }
   // --- AZIONI OSPITI ---

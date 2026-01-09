@@ -466,6 +466,10 @@
           
           <div class="left-col">
             <div class="pdf-viewer-container">
+              <div class="pdf-loading" *ngIf="isPdfLoading">
+                <ion-spinner name="crescent"></ion-spinner>
+                <p>Caricamento PDF...</p>
+              </div>
               <ng-container *ngIf="privacyPdfSrc; else noPdf">
                 <pdf-viewer
                   [src]="privacyPdfSrc"
@@ -480,6 +484,8 @@
                   [external-link-target]="'blank'"
                   [autoresize]="true"
                   [show-borders]="false"
+                  (after-load-complete)="onPdfLoadComplete()"
+                  (error)="onPdfLoadError()"
                   class="pdf-viewer-custom"
                 ></pdf-viewer>
               </ng-container>
@@ -488,7 +494,7 @@
                 <div class="pdf-error">
                   <ion-icon name="alert-circle-outline"></ion-icon>
                   <p>Nessuna informativa caricata</p>
-                </div>
+  </div>
               </ng-template>
             </div>
           </div>
@@ -546,4 +552,5 @@
       </ion-footer>
     </ng-template>
   </ion-modal>
+  <ion-loading [isOpen]="isBlockingLoading" [message]="loadingMessage"></ion-loading>
 </ion-content>

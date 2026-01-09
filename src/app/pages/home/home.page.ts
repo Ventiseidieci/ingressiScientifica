@@ -1,11 +1,11 @@
 import { addIcons } from 'ionicons';
 import { create, checkmarkCircle, refreshOutline, linkOutline, documentTextOutline, alertCircleOutline, arrowBackOutline } from 'ionicons/icons';
-import { ActiveEmployeeResult } from './../../services/database';
 import { Component, ElementRef, OnDestroy, AfterViewInit, ViewChild, Renderer2, inject } from '@angular/core';
-import { IonContent, IonSelect, IonCheckbox, ToastController, IonButton, IonSelectOption, IonRow, IonGrid, IonCol, IonCard, IonCardTitle, IonCardContent, IonInput, IonCardHeader, IonItem, IonIcon, IonModal, IonToolbar, IonHeader, IonTitle, IonButtons, IonFooter, IonAvatar, IonBadge, IonLabel, IonList,IonSearchbar } from '@ionic/angular/standalone';
+import { IonContent, IonSelect, IonCheckbox, ToastController, IonButton, IonSelectOption, IonRow, IonGrid, IonCol, IonCard, IonCardTitle, IonCardContent, IonInput, IonCardHeader, IonItem, IonIcon, IonModal, IonToolbar, IonHeader, IonTitle, IonButtons, IonFooter, IonAvatar, IonBadge, IonLabel, IonList, IonSearchbar, IonLoading, IonSpinner } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DatabaseService, Guest, Startup, Employee, Supplier, ThirdParty, Reason } from 'src/app/services/database';
+import { DatabaseService } from 'src/app/services/database';
+import { Guest, Startup, Employee, Supplier, ThirdParty, Reason } from 'src/app/models/database.models';
 import { Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, map, Observable, tap } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -14,7 +14,7 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [PdfViewerModule, IonList, IonLabel, IonFooter, IonCheckbox, FormsModule, IonButtons, IonTitle, IonHeader, IonCol, IonToolbar, IonModal, IonIcon, IonItem, IonSelect, IonButton, IonSelectOption, IonCardHeader, IonInput, IonCardContent, IonCardTitle, IonCard, IonGrid, IonRow, IonContent, CommonModule, IonSearchbar, IonAvatar, IonBadge],
+  imports: [PdfViewerModule, IonList, IonLabel, IonFooter, IonCheckbox, FormsModule, IonButtons, IonTitle, IonHeader, IonCol, IonToolbar, IonModal, IonIcon, IonItem, IonSelect, IonButton, IonSelectOption, IonCardHeader, IonInput, IonCardContent, IonCardTitle, IonCard, IonGrid, IonRow, IonContent, CommonModule, IonSearchbar, IonAvatar, IonBadge, IonLoading, IonSpinner],
 })
 
 export class HomePage implements AfterViewInit, OnDestroy {
@@ -42,6 +42,9 @@ export class HomePage implements AfterViewInit, OnDestroy {
   checkConsense1: boolean = false; // "Dichiaro di aver letto..."
   checkConsense2: boolean = false; // "Accetto il trattamento..."
   hasSigned: boolean = false;
+  isBlockingLoading: boolean = false;
+  loadingMessage: string = '';
+  isPdfLoading: boolean = false;
   // Variabili per il disegno
   private signaturePadElement: any;
   private signatureCtx: any;
@@ -562,10 +565,12 @@ export class HomePage implements AfterViewInit, OnDestroy {
   // --- LOGICA MODALE E FIRMA ---
   openPrivacyModal() {
     this.isPrivacyModalOpen = true;
+    this.isPdfLoading = !!this.privacyPdfSrc;
   }
 
   closePrivacyModal() {
     this.isPrivacyModalOpen = false;
+    this.isPdfLoading = false;
     this.isDrawing = false;
     if (this.signaturePadElement) {
     this.signatureImage = this.signaturePadElement.toDataURL(); // Ottieni Base64
@@ -627,6 +632,14 @@ export class HomePage implements AfterViewInit, OnDestroy {
     this.isDrawing = false;
   }
 
+  onPdfLoadComplete() {
+    this.isPdfLoading = false;
+  }
+
+  onPdfLoadError() {
+    this.isPdfLoading = false;
+  }
+
   // Calcola coordinate relative al canvas
 // Calcola coordinate relative al canvas (con correzione scala)
   getCoordinates(ev: any) {
@@ -671,6 +684,8 @@ export class HomePage implements AfterViewInit, OnDestroy {
       signatureUrl: this.signatureImage || '' // <--- SALVA LA FIRMA QUI
     };
     this.setView('main')
+    this.loadingMessage = 'Salvataggio in corso...';
+    this.isBlockingLoading = true;
     try {
       if(await this.dbService.checkInGuest(newGuest)){
         this.showToast(`Benvenuto ${this.guestName}`, 'success');
@@ -680,6 +695,8 @@ export class HomePage implements AfterViewInit, OnDestroy {
       }; // Usa il metodo aggiornato
     } catch (err) {
       console.error(err);
+    } finally {
+      this.isBlockingLoading = false;
     }
   }
 

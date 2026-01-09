@@ -492,6 +492,7 @@
       </ion-row>
     </ion-grid>
   </div>
+  <ion-loading [isOpen]="isBlockingLoading" [message]="loadingMessage"></ion-loading>
 
   <div *ngIf="selectedSegment === 'third_parties'">
     <ion-grid>
