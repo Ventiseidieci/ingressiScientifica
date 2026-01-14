@@ -1,0 +1,13 @@
+[
+  {
+    "origin": [
+      "https://localhost",
+      "http://localhost",
+      "ionic://localhost",
+      "capacitor://localhost"
+    ],
+    "method": ["GET", "HEAD", "OPTIONS"],
+    "responseHeader": ["Content-Type", "Content-Length", "Content-Disposition"],
+    "maxAgeSeconds": 3600
+  }
+]

@@ -3,22 +3,22 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 
-import { 
-  Firestore, 
-  collection, 
-  addDoc, 
+import {
+  Firestore,
+  collection,
+  addDoc,
   setDoc,
-  updateDoc, 
+  updateDoc,
   deleteDoc,
-  doc, 
-  query, 
-  where, 
+  doc,
+  query,
+  where,
   orderBy,
   onSnapshot,
   arrayUnion,
   getDoc,
   arrayRemove
-} from '@angular/fire/firestore'; 
+} from '@angular/fire/firestore';
 
 import { lastValueFrom, Observable } from 'rxjs';
 
@@ -53,25 +53,25 @@ export interface ActiveEmployeeResult {
 }
 
 // Per "Ospiti" (Motivazioni)
-export interface Reason { 
-  id?: string; 
-  text: string; 
-} 
+export interface Reason {
+  id?: string;
+  text: string;
+}
 
- // Per "Fornitori"
+// Per "Fornitori"
 export interface Supplier {
-  id?: string; 
-  name: string; 
-  status?: 'IN' | 'OUT'; 
+  id?: string;
+  name: string;
+  status?: 'IN' | 'OUT';
   lastEntryTime?: string;
   logoUrl?: string;
 }
 
 // Utenti Terzi è identica a Startup come struttura
-export interface ThirdParty { 
-  id?: string; 
-  name: string; 
-  logoUrl?: string; 
+export interface ThirdParty {
+  id?: string;
+  name: string;
+  logoUrl?: string;
   employees: Employee[];
 }
 export interface ActiveThirdPartyEmployeeResult {
@@ -89,7 +89,7 @@ export class DatabaseService {
   // Inietta l'istanza Firestore di Angular
   private firestore = inject(Firestore);
   private http = inject(HttpClient);
-  
+
   // URL del Google Apps Script per logging su Google Sheets
   private googleStartupScriptUrl = 'https://script.google.com/macros/s/AKfycby6IM_hyL-AjcfUkXAsjRW5DONEr6cDDC2zXKr0FcuuEJ6zx_TmgZuJtvJk4Ciyhooa/exec';
   private googleGuestScriptUrl = 'https://script.google.com/macros/s/AKfycbxFpx0-jaKYcHvuFzouPDsSAwvGzKB6JlS5LmHJ7f4YdNrn3cYR7tiVCI5otI4ncoma/exec'
@@ -99,7 +99,7 @@ export class DatabaseService {
 
   private getCollectionData<T>(queryRef: any): Observable<T[]> {
     return new Observable((observer) => {
-      const unsubscribe = onSnapshot(queryRef, 
+      const unsubscribe = onSnapshot(queryRef,
         (snapshot: any) => {
           const data = snapshot.docs.map((doc: any) => ({
             id: doc.id,
@@ -113,7 +113,7 @@ export class DatabaseService {
     });
   }
 
-async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
+  async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     // 1. Se è vuoto o è già un link web (http...), non fare nulla
     if (!base64OrUrl || !base64OrUrl.startsWith('data:')) {
       return base64OrUrl || '';
@@ -122,22 +122,22 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     try {
       // 2. Converti Base64 in Blob
       const blob = this.dataURLtoBlob(base64OrUrl);
-      
+
       // 3. Genera nome file unico
-      const mime = blob.type; 
-      const ext = mime.split('/')[1] || 'png'; 
+      const mime = blob.type;
+      const ext = mime.split('/')[1] || 'png';
       const fileName = `${folder}/${new Date().getTime()}.${ext}`;
-      
+
       // 4. Carica su Storage
       const storage = getStorage();
       const storageRef = ref(storage, fileName);
-      
+
       await uploadBytes(storageRef, blob);
-      
+
       // 5. Ottieni URL scaricabile
       const downloadUrl = await getDownloadURL(storageRef);
       console.log(`Upload completato in ${folder}:`, downloadUrl);
-      
+
       return downloadUrl;
 
     } catch (e) {
@@ -157,22 +157,22 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     }
     return new Blob([u8arr], { type: mime });
   }
-// Converte la stringa Base64 (salvata in Firestore) in un Blob reale
+  // Converte la stringa Base64 (salvata in Firestore) in un Blob reale
   base64ToBlob(base64: string): Blob {
     try {
       // 1. Rimuovi l'intestazione "data:application/pdf;base64," se presente
       const base64Clean = base64.split(',')[1] || base64;
-      
+
       // 2. Decodifica la stringa
       const byteCharacters = atob(base64Clean);
       const byteNumbers = new Array(byteCharacters.length);
-      
+
       for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
-      
+
       const byteArray = new Uint8Array(byteNumbers);
-      
+
       // 3. Ritorna il Blob (File)
       return new Blob([byteArray], { type: 'application/pdf' });
     } catch (e) {
@@ -197,10 +197,10 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
       await lastValueFrom(this.logGuestActionToSheet(guest, "INGRESSO"))
       console.log('Logsheet INGRESSO inviato con successo');
       return true;
-    }catch (error) {
+    } catch (error) {
       console.log('Errore logsheet, contattare amministratore', error);
       return false;
-    } 
+    }
   }
 
   async checkOutGuest(guest: Guest) {
@@ -230,30 +230,30 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
   }
 
   logGuestActionToSheet(guest: Guest, action: 'INGRESSO' | 'USCITA'): Observable<any> {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('it-IT');
-      const timeStr = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('it-IT');
+    const timeStr = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
 
-      let sheetName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-      sheetName = sheetName.charAt(0).toUpperCase() + sheetName.slice(1);
+    let sheetName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+    sheetName = sheetName.charAt(0).toUpperCase() + sheetName.slice(1);
 
-      const sheetPayload = {
-        targetSheet: sheetName,
-        action: action,
-        data: {
-          Data: dateStr,
-          Dipendente: guest.name,
-          Motivazione: guest.reason,
-          Firma: guest.signatureUrl || "N/A",
-          Ora: timeStr
-        }
-      };
+    const sheetPayload = {
+      targetSheet: sheetName,
+      action: action,
+      data: {
+        Data: dateStr,
+        Dipendente: guest.name,
+        Motivazione: guest.reason,
+        Firma: guest.signatureUrl || "N/A",
+        Ora: timeStr
+      }
+    };
 
-      // Ritorna direttamente la chiamata HTTP (Observable)
-      return this.http.post(this.googleGuestScriptUrl, JSON.stringify(sheetPayload), {
-        headers: { 'Content-Type': 'text/plain' }
-      });
-    }
+    // Ritorna direttamente la chiamata HTTP (Observable)
+    return this.http.post(this.googleGuestScriptUrl, JSON.stringify(sheetPayload), {
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  }
 
   getActiveGuests(): Observable<Guest[]> {
     const guestsRef = collection(this.firestore, 'guests');
@@ -273,9 +273,9 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     return deleteDoc(docRef);
   }
 
-// ==========================================
-// GESTIONE STARTUP & DIPENDENTI
-// ==========================================
+  // ==========================================
+  // GESTIONE STARTUP & DIPENDENTI
+  // ==========================================
 
   // Aggiungi Startup
   async addStartup(startup: Startup) {
@@ -316,7 +316,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
             }
           }
         }
-        
+
         // Opzionale: Ordina per orario di ingresso più recente
         return activeList.sort((a, b) => {
           const timeA = a.employee.lastEntryTime || '';
@@ -329,7 +329,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
 
   // logga l'azione di ingresso/uscita del dipendente su Google Sheets
   logEmployeeActionToSheet(employee: Employee, startupName: string, action: 'INGRESSO' | 'USCITA') {
-    
+
     const now = new Date();
     const dateStr = now.toLocaleDateString('it-IT'); // Es. 28/11/2025
     const timeStr = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); // Es. 09:30
@@ -389,7 +389,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
   // Modifica dati Dipendente (Trova il vecchio e lo sostituisce col nuovo)
   async updateEmployeeDetails(startupId: string, oldEmp: Employee, newEmp: Employee) {
     const startupRef = doc(this.firestore, 'startups', startupId);
-    
+
     // Leggi array attuale
     const snapshot = await getDoc(startupRef);
     if (!snapshot.exists()) throw new Error("Startup non trovata");
@@ -399,7 +399,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     const updatedEmployees = employees.map(e => {
       // Confrontiamo per nome e ruolo (o potremmo usare un ID se lo avessimo)
       if (e.name === oldEmp.name && e.role === oldEmp.role) {
-        return { ...newEmp, status: e.status || 'OUT', lastEntryTime: e.lastEntryTime || null}; // Mantieni lo stato IN/OUT
+        return { ...newEmp, status: e.status || 'OUT', lastEntryTime: e.lastEntryTime || null }; // Mantieni lo stato IN/OUT
       }
       return e;
     });
@@ -410,28 +410,28 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
   // Aggiorna lo stato del dipendente DENTRO l'array della startup
   async updateEmployeeStatus(startupId: string, employeeName: string, newStatus: 'IN' | 'OUT') {
     const startupRef = doc(this.firestore, 'startups', startupId);
-    
+
     // 1. Leggi il documento attuale
     const snapshot = await getDoc(startupRef);
     if (!snapshot.exists()) throw new Error("Startup non trovata");
-    
+
     const startupData = snapshot.data() as Startup;
     const employees = startupData.employees || [];
 
     // 2. Trova e modifica il dipendente nell'array locale
     const updatedEmployees = employees.map(emp => {
       if (emp.name === employeeName) {
-        return { 
-          ...emp, 
+        return {
+          ...emp,
           status: newStatus,
-          lastEntryTime: new Date().toISOString() 
+          lastEntryTime: new Date().toISOString()
         };
       }
       return emp;
     });
     this.logEmployeeActionToSheet(
-      updatedEmployees.find(e => e.name === employeeName)!, 
-      startupData.name, 
+      updatedEmployees.find(e => e.name === employeeName)!,
+      startupData.name,
       newStatus === 'IN' ? 'INGRESSO' : 'USCITA'
     );
     // 3. Sovrascrivi l'array nel database
@@ -487,7 +487,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
 
     let sheetName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
     sheetName = sheetName.charAt(0).toUpperCase() + sheetName.slice(1);
-    
+
     const defaultPlaceholder = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAD0lEQVR4AQEEAPv/AFSrhALaAYQsuW/kAAAAAElFTkSuQmCC"
     let firmaBase64 = defaultPlaceholder;
     // Se il fornitore ha un logo, prova a convertirlo
@@ -497,7 +497,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
         firmaBase64 = converted;
       }
     }
-    
+
     const sheetPayload = {
       targetSheet: sheetName,
       action: action,
@@ -505,7 +505,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
         Data: dateStr,
         Dipendente: supplier.name,
         Firma: firmaBase64,
-        Motivazione:"Fornitore",
+        Motivazione: "Fornitore",
         Ora: timeStr
       }
     };
@@ -517,7 +517,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     });
   }
 
-// CORREZIONE: Gestisce sia il toggle automatico che l'impostazione manuale
+  // CORREZIONE: Gestisce sia il toggle automatico che l'impostazione manuale
   async updateSupplierStatus(supplier: Supplier, newStatus?: 'IN' | 'OUT') {
     if (!supplier.id) {
       console.error('Supplier ID mancante');
@@ -535,7 +535,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
 
     try {
       const supplierRef = doc(this.firestore, 'suppliers', supplier.id);
-      
+
       // 2. AGGIORNA FIRESTORE
       await updateDoc(supplierRef, {
         status: newStatus,
@@ -582,14 +582,14 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
   async updateThirdParty(id: string, data: Partial<ThirdParty>) {
     return updateDoc(doc(this.firestore, 'third_parties', id), data);
   }
-  
+
   // Gestione Dipendenti Utenti Terzi
   async addEmployeeToThirdParty(tpId: string, employee: Employee) {
     const ref = doc(this.firestore, 'third_parties', tpId);
     const newEmp = { ...employee, status: 'OUT' };
     return updateDoc(ref, { employees: arrayUnion(newEmp) });
   }
-  
+
   async removeEmployeeFromThirdParty(tpId: string, employeeName: string) {
     const ref = doc(this.firestore, 'third_parties', tpId);
     const snapshot = await getDoc(ref);
@@ -603,29 +603,30 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     // Stessa logica di updateEmployeeStatus per Startup ma sulla collezione third_parties
     console.log(thirdPartyID)
     const ref = doc(this.firestore, 'third_parties', thirdPartyID);
-    const snapshot = await getDoc(ref) ;
+    const snapshot = await getDoc(ref);
     if (!snapshot.exists()) throw new Error("Third party not found ");
     const thirdParty = snapshot.data() as ThirdParty;
     const employees = thirdParty.employees || [];
     const updatedEmployees = employees.map(emp => {
       if (emp.name === employeeName) {
-        return { 
-          ...emp, 
-          status: newStatus, 
-          lastEntryTime: new Date().toISOString() };
+        return {
+          ...emp,
+          status: newStatus,
+          lastEntryTime: new Date().toISOString()
+        };
       }
       return emp;
     });
     this.logThirdPartyActionToSheet(
-      updatedEmployees.find(e => e.name === employeeName)!, 
-      thirdParty, 
+      updatedEmployees.find(e => e.name === employeeName)!,
+      thirdParty,
       newStatus === 'IN' ? 'INGRESSO' : 'USCITA'
     );
     return updateDoc(ref, { employees: updatedEmployees });
   }
 
   getAllActiveThirdPartyEmployees(): Observable<ActiveThirdPartyEmployeeResult[]> {
-// 1. Prendi lo stream delle startup (che si aggiorna in tempo reale)
+    // 1. Prendi lo stream delle startup (che si aggiorna in tempo reale)
     return this.getThirdParties().pipe(
       // 2. Trasforma i dati
       map(thirdParties => {
@@ -646,7 +647,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
             }
           }
         }
-        
+
         // Opzionale: Ordina per orario di ingresso più recente
         return activeList.sort((a, b) => {
           const timeA = a.employee.lastEntryTime || '';
@@ -661,8 +662,8 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     const now = new Date();
     const dateStr = now.toLocaleDateString('it-IT');
     const timeStr = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    
-        // Ottieni "dicembre 2025"
+
+    // Ottieni "dicembre 2025"
     let sheetName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
     // Rendi la prima lettera maiuscola
     sheetName = sheetName.charAt(0).toUpperCase() + sheetName.slice(1);
@@ -685,10 +686,10 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
     });
   }
 
-    // Modifica dati Dipendente (Trova il vecchio e lo sostituisce col nuovo)
+  // Modifica dati Dipendente (Trova il vecchio e lo sostituisce col nuovo)
   async updateTpEmployeeDetails(thirdPartyId: string, oldEmp: Employee, newEmp: Employee) {
     const thirdPartyRef = doc(this.firestore, 'third_parties', thirdPartyId);
-    
+
     // Leggi array attuale
     const snapshot = await getDoc(thirdPartyRef);
     if (!snapshot.exists()) throw new Error("Utente Terzo non trovato");
@@ -723,7 +724,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
   }
 
 
-// Carica il PDF grezzo su Storage e salva il link nel DB
+  // Carica il PDF grezzo su Storage e salva il link nel DB
   async savePrivacyPdf(pdfFile: File) {
     try {
       // 1. Definisci il percorso su Storage
@@ -760,7 +761,7 @@ async uploadFile(base64OrUrl: string, folder: string): Promise<string> {
       return () => unsubscribe();
     });
   }
-  
+
   // Helper: Converte URL immagine in Base64
   private async imageUrlToBase64(url: string): Promise<string> {
     try {
