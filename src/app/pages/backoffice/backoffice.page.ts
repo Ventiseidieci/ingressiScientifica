@@ -31,7 +31,6 @@ export class BackofficePage {
 
   private _privacyEditor: ElementRef | undefined;
   privacyUrl: string = '';
-  
 
   // deprecato
   get privacyEditor(): ElementRef | undefined {
