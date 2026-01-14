@@ -374,10 +374,13 @@ async savePrivacyPdf() {
 
   async addTpEmployee() {
     if (!this.selectedThirdParty || !this.newTpEmpName) return;
-    this.newTpEmpImage = await this.dbService.uploadFile(this.newTpEmpImage, `thirdParties/${this.selectedThirdParty.name}/employees/${this.newTpEmpName}`);
+    this.newTpEmpImage = await this.dbService.uploadFile(
+      this.newTpEmpImage,
+      `thirdParties/${this.selectedThirdParty.name}/employees/${this.newTpEmpName}`
+    );
     const emp: Employee = { name: this.newTpEmpName, role: this.newTpEmpRole, imageUrl: this.newTpEmpImage };
     await this.dbService.addEmployeeToThirdParty(this.selectedThirdParty.id!, emp);
-    this.newTpEmpName = ''; this.newTpEmpRole = ''; this.newTpEmpImage = '';
+    this.resetTpEmployeeForm();
   }
 
   async deleteTpEmployee(emp: Employee) {
@@ -394,7 +397,7 @@ async savePrivacyPdf() {
       // Seleziona (Entra nel dettaglio)
   selectThirdParty(s: ThirdParty) {
     this.selectedThirdParty = { ...s }; // Crea una copia per l'editing sicuro
-    this.resetEmployeeForm();
+    this.resetTpEmployeeForm();
   }
 
   // Deseleziona (Torna alla lista)
@@ -414,27 +417,41 @@ async savePrivacyPdf() {
     alert('Utente Terzo aggiornato!');
   }
 
-  saveTpEmployee() {
+  async saveTpEmployee() {
+    if (!this.selectedThirdParty || !this.newTpEmpName) return;
+    this.newTpEmpImage = await this.dbService.uploadFile(
+      this.newTpEmpImage,
+      `thirdParties/${this.selectedThirdParty.name}/employees/${this.newTpEmpName}`
+    );
     if (this.editingEmployee) {
-      this.dbService.updateTpEmployeeDetails(this.selectedThirdParty!.id!, this.editingEmployee, {
+      await this.dbService.updateTpEmployeeDetails(this.selectedThirdParty.id!, this.editingEmployee, {
         name: this.newTpEmpName,
         role: this.newTpEmpRole,
         imageUrl: this.newTpEmpImage
       });
     } else {
-      this.addTpEmployee();
+      await this.dbService.addEmployeeToThirdParty(this.selectedThirdParty.id!, {
+        name: this.newTpEmpName,
+        role: this.newTpEmpRole,
+        imageUrl: this.newTpEmpImage
+      });
     }
-    this.newTpEmpName = '';
-    this.newTpEmpRole = '';
-    this.newTpEmpImage = '';
-    this.editingEmployee = null;
+    this.resetTpEmployeeForm();
   }
 
     // Prepara il form per la modifica
   editTpEmployee(emp: Employee) {
     this.editingEmployee = emp; // Salviamo chi stiamo modificando
-    this.empFormName = emp.name;
-    this.empFormImage = emp.imageUrl || '';
+    this.newTpEmpName = emp.name;
+    this.newTpEmpRole = emp.role || '';
+    this.newTpEmpImage = emp.imageUrl || '';
+  }
+
+  resetTpEmployeeForm() {
+    this.editingEmployee = null;
+    this.newTpEmpName = '';
+    this.newTpEmpRole = '';
+    this.newTpEmpImage = '';
   }
 
   removeNewStartupLogo() {

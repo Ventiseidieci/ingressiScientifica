@@ -604,24 +604,30 @@
                   <h4 style="margin-top:0">{{ editingEmployee ? 'Modifica Dipendente' : 'Nuovo Dipendente' }}</h4>
                   <ion-row class="ion-align-items-center">
                     <ion-col size="auto">
-                      <div class="drop-zone avatar-zone" (drop)="onDrop($event, 'employee')" (dragover)="onDragOver($event)">
-                        <img *ngIf="empFormImage" [src]="empFormImage" class="avatar-preview">
+                      <div class="drop-zone avatar-zone" (drop)="onDrop($event, 'tpEmployee')" (dragover)="onDragOver($event)">
+                        <img *ngIf="newTpEmpImage" [src]="newTpEmpImage" class="avatar-preview">
   
-                        <div *ngIf="!empFormImage" class="icon-placeholder">
+                        <div *ngIf="!newTpEmpImage" class="icon-placeholder">
                           <ion-icon name="cloud-upload-outline"></ion-icon>
                         </div>
                       </div>
+                      <ion-button *ngIf="newTpEmpImage" fill="clear" color="danger" (click)="removeTpEmployeeImage()" title="Rimuovi immagine">
+                        <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                      </ion-button>
                     </ion-col>
                     <ion-col>
                       <ion-item>
-                        <ion-input placeholder="Nome e Cognome" [(ngModel)]="empFormName"></ion-input>
+                        <ion-input placeholder="Nome e Cognome" [(ngModel)]="newTpEmpName"></ion-input>
+                      </ion-item>
+                      <ion-item>
+                        <ion-input placeholder="Ruolo" [(ngModel)]="newTpEmpRole"></ion-input>
                       </ion-item>
                     </ion-col>
                     <ion-col size="auto">
                       <ion-button (click)="saveTpEmployee()" [color]="editingEmployee ? 'warning' : 'primary'">
                         {{ editingEmployee ? 'Aggiorna' : 'Aggiungi' }}
                       </ion-button>
-                      <ion-button *ngIf="editingEmployee" fill="clear" (click)="resetEmployeeForm()">Annulla</ion-button>
+                      <ion-button *ngIf="editingEmployee" fill="clear" (click)="resetTpEmployeeForm()">Annulla</ion-button>
                     </ion-col>
                   </ion-row>
                 </div>
@@ -636,6 +642,7 @@
                         </ion-avatar>
                         <ion-label>
                           <h3>{{ emp.name }}</h3>
+                          <p *ngIf="emp.role">{{ emp.role }}</p>
                         </ion-label>
                         
                         <ion-button slot="end" fill="clear" (click)="editTpEmployee(emp)">
