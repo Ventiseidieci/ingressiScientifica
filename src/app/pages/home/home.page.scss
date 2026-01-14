@@ -41,6 +41,8 @@ ion-content {
 /* ========================================================= */
 
 .box-header{
+  margin-top: 20px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -74,7 +76,7 @@ ion-content {
 /* --- STILE BASE (Vale per tutti) --- */
 .menu-wrapper {
   position: absolute;
-  top: 50%;
+  top: 53%;
   left: 50%;
   transform: translate(-50%, -40%) scale(0.95); /* Partenza animazione */
   width: 100%;
@@ -335,7 +337,7 @@ ion-content {
 
 /* --- CONTENITORE SCROLL VERTICALE (Effetto Orologio) --- */
 .vertical-scroll-container {
-  max-height: 60vh; /* Altezza massima visibile */
+  max-height: 80vh; /* Altezza massima visibile */
   width: 85%;
   overflow-y: auto;   /* Abilita scroll verticale */
   overflow-x: hidden; /* Disabilita scroll orizzontale */
