@@ -10,13 +10,16 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, map, Observable, tap } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
+
+// Keep in sync with routing states in the template.
+type HomeView = 'main' | 'guestsHome' | 'fornitoriHome' | 'thirdParties' | 'thirdPartyEmployees' | 'fornitoriAccess' | 'fornitoriExit' | 'guestsData' | 'startupEmployees' | 'guestsExit' | 'utenti3' | 'startup' | 'fornitori' | 'exolab' | 'loto' | 'libera' | 'startupChoice' | 'startupAccess' | 'startupExit';
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   imports: [PdfViewerModule, IonList, IonLabel, IonFooter, IonCheckbox, FormsModule, IonButtons, IonTitle, IonHeader, IonCol, IonToolbar, IonModal, IonIcon, IonItem, IonSelect, IonButton, IonSelectOption, IonCardHeader, IonInput, IonCardContent, IonCardTitle, IonCard, IonGrid, IonRow, IonContent, CommonModule, IonSearchbar, IonAvatar, IonBadge],
 })
-
 export class HomePage implements AfterViewInit, OnDestroy {
   @ViewChild('backgroundCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('signatureCanvas') signatureCanvas!: ElementRef<HTMLCanvasElement>;
@@ -115,9 +118,20 @@ export class HomePage implements AfterViewInit, OnDestroy {
   `;
 
   // GESTIONE VISTE 
-  currentView:'main' | 'guestsHome' | 'fornitoriHome' | 'thirdParties' | 'thirdPartyEmployees' | 'fornitoriAccess' | 'fornitoriExit' | 'guestsData' | 'startupEmployees' |'guestsExit' |'utenti3'| 'startup' | 'fornitori' | 'exolab' | 'loto' | 'libera' | 'startupChoice' | 'startupAccess'| 'startupExit'  = 'main';
+  currentView: HomeView = 'main';
+  private viewHistory: HomeView[] = [];
 
-  setView(view: 'main' | 'guestsHome' | 'guestsData' | 'fornitoriHome' | 'thirdParties' | 'thirdPartyEmployees'  | 'fornitoriAccess' | 'fornitoriExit' | 'guestsExit' | 'startupEmployees' |  'utenti3'| 'startup' | 'fornitori' | 'startupChoice' | 'startupAccess'| 'startupExit'  ) {
+  get canGoBack(): boolean {
+    return this.viewHistory.length > 0;
+  }
+
+  setView(view: HomeView, pushHistory: boolean = true) {
+    if (view === this.currentView) return;
+    if (view === 'main') {
+      this.viewHistory = [];
+    } else if (pushHistory) {
+      this.viewHistory.push(this.currentView);
+    }
     if (view === 'guestsData') { 
       this.guestName = '';
       this.selectedReason = '';
@@ -130,6 +144,13 @@ export class HomePage implements AfterViewInit, OnDestroy {
       this.activeSuppliers$ = this.dbService.getActiveSuppliers();
     }
     this.currentView = view;
+  }
+
+  goBack() {
+    const previousView = this.viewHistory.pop();
+    if (previousView) {
+      this.setView(previousView, false);
+    }
   }
 
   constructor(

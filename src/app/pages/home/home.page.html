@@ -7,6 +7,10 @@
     <div class="logo" data-maxheight="60">
       <img fetchpriority="high" decoding="async" src="https://scientifica.vc/wp-content/uploads/2025/05/Favicon-Scientifica_Positive.png" alt="logo" class="img-responsive" data-cmp-info="10">
     </div>
+    <ion-button *ngIf="canGoBack" fill="clear" class="back-button" (click)="goBack(); $event.stopPropagation()">
+      <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+      <span class="back-text"> INDIETRO</span>
+    </ion-button>
     <!-- <div class="backoffice">
       <h2 (click)="navigateToBackoffice()">Backoffice</h2>
     </div> -->

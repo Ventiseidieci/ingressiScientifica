@@ -42,6 +42,8 @@ ion-content {
 
 .box-header{
   display: flex;
+  align-items: center;
+  gap: 12px;
   height: auto;
   padding-top: 24px;
   padding-bottom: 24px;
@@ -49,6 +51,18 @@ ion-content {
 
   position: relative;
   z-index: 10;
+}
+.back-button{
+  display: flex;
+  align-items: center;
+  margin-left: 5px;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  .back-text{
+    margin-top: 3px;
+  }
 }
 
 .box-content{
