@@ -567,9 +567,17 @@ export class HomePage implements AfterViewInit, OnDestroy {
   closePrivacyModal() {
     this.isPrivacyModalOpen = false;
     this.isDrawing = false;
-    if (this.signaturePadElement) {
-    this.signatureImage = this.signaturePadElement.toDataURL(); // Ottieni Base64
+    if (!this.signatureImage) {
+      this.clearSignature();
     }
+  }
+
+  confirmPrivacyModal() {
+    if (this.canProceed && this.signaturePadElement) {
+      this.signatureImage = this.signaturePadElement.toDataURL(); // Ottieni Base64
+    }
+    this.isPrivacyModalOpen = false;
+    this.isDrawing = false;
   }
 
   // Chiamato quando il modale ha finito di aprirsi (importante per inizializzare il canvas)
@@ -658,7 +666,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
   async acceptAndSign() {
-    if (this.signaturePadElement) {
+    if (!this.signatureImage && this.signaturePadElement && this.hasSigned) {
       this.signatureImage = this.signaturePadElement.toDataURL(); // Ottieni Base64
     }
     
