@@ -187,6 +187,10 @@ export class FirestoreDataService {
     return addDoc(collection(this.firestore, 'reasons'), { text });
   }
 
+  async updateReason(id: string, text: string) {
+    return updateDoc(doc(this.firestore, 'reasons', id), { text });
+  }
+
   async deleteReason(id: string) {
     return deleteDoc(doc(this.firestore, 'reasons', id));
   }

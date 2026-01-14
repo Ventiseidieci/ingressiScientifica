@@ -336,10 +336,24 @@
               
               <ion-list class="ion-margin-top">
                 <ion-item *ngFor="let r of reasons$ | async">
-                  <ion-label>{{ r.text }}</ion-label>
-                  <ion-button slot="end" fill="clear" color="danger" (click)="deleteReason(r.id!)">
-                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
+                  <ng-container *ngIf="editingReasonId === r.id; else viewReason">
+                    <ion-input label="Modifica" labelPlacement="floating" [(ngModel)]="editingReasonText"></ion-input>
+                    <ion-button slot="end" fill="clear" color="primary" (click)="saveReason()" [disabled]="!editingReasonText.trim()">
+                      <ion-icon name="save-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                    <ion-button slot="end" fill="clear" color="medium" (click)="cancelEditReason()">
+                      <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </ng-container>
+                  <ng-template #viewReason>
+                    <ion-label>{{ r.text }}</ion-label>
+                    <ion-button slot="end" fill="clear" (click)="startEditReason(r)">
+                      <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                    <ion-button slot="end" fill="clear" color="danger" (click)="deleteReason(r.id!)">
+                      <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </ng-template>
                 </ion-item>
               </ion-list>
             </ion-card-content>
@@ -410,7 +424,12 @@
                   <ion-icon name="cloud-upload-outline"></ion-icon>
                   <p>Trascina Logo</p>
                 </div>
-                <img *ngIf="newSupplierLogo" [src]="newSupplierLogo" class="preview-img">
+                <div *ngIf="newSupplierLogo" class="preview-container">
+                  <img [src]="newSupplierLogo" class="preview-img">
+                  <ion-button fill="clear" color="danger" (click)="removeSupplierLogo()" title="Rimuovi immagine">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
               </div>
 
               <ion-button expand="block" (click)="addSupplier()" [disabled]="!newSupplierName">
@@ -467,7 +486,12 @@
                 <ion-row>
                   <ion-col size="4">
                     <div class="drop-zone small" (drop)="onDrop($event, 'editSupplier')" (dragover)="onDragOver($event)">
-                      <img *ngIf="selectedSupplier.logoUrl" [src]="selectedSupplier.logoUrl" class="preview-img">
+                      <div *ngIf="selectedSupplier.logoUrl" class="preview-container">
+                        <img [src]="selectedSupplier.logoUrl" class="preview-img">
+                        <ion-button fill="clear" color="danger" (click)="removeSupplierLogo()">
+                          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                        </ion-button>
+                      </div>
   
                       <div *ngIf="!selectedSupplier.logoUrl" class="icon-placeholder">
                         <ion-icon name="cloud-upload-outline"></ion-icon>
@@ -516,7 +540,12 @@
                   <ion-icon name="cloud-upload-outline"></ion-icon>
                   <p>Trascina Logo</p>
                 </div>
-                <img *ngIf="newThirdPartyLogo" [src]="newThirdPartyLogo" class="preview-img">
+                <div *ngIf="newThirdPartyLogo" class="preview-container">
+                  <img [src]="newThirdPartyLogo" class="preview-img">
+                  <ion-button fill="clear" color="danger" (click)="removeThirdPartyLogo()" title="Rimuovi immagine">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
               </div>
 
               <ion-button expand="block" (click)="addThirdParty()" [disabled]="!newThirdPartyName">
@@ -574,7 +603,12 @@
                 <ion-row>
                   <ion-col size="4">
                     <div class="drop-zone small" (drop)="onDrop($event, 'editThirdParty')" (dragover)="onDragOver($event)">
-                      <img *ngIf="selectedThirdParty.logoUrl" [src]="selectedThirdParty.logoUrl" class="preview-img">
+                      <div *ngIf="selectedThirdParty.logoUrl" class="preview-container">
+                        <img [src]="selectedThirdParty.logoUrl" class="preview-img">
+                        <ion-button fill="clear" color="danger" (click)="removeThirdPartyLogo()">
+                          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                        </ion-button>
+                      </div>
 
                       <div *ngIf="!selectedThirdParty.logoUrl" class="icon-placeholder">
                         <ion-icon name="cloud-upload-outline"></ion-icon>

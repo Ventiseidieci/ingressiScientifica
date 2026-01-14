@@ -126,6 +126,10 @@ export class DatabaseService {
     return this.dataService.addReason(text);
   }
 
+  updateReason(id: string, text: string) {
+    return this.dataService.updateReason(id, text);
+  }
+
   deleteReason(id: string) {
     return this.dataService.deleteReason(id);
   }

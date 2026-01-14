@@ -5,13 +5,13 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonSegment, IonSegmentButton, 
   IonLabel, IonList, IonItem, IonInput, IonButton, IonIcon, IonCard, IonCardContent,
   IonGrid, IonRow, IonCol, IonAvatar, IonSelect, IonSelectOption, 
-  IonTextarea, IonSearchbar, IonCardHeader, IonCardTitle, IonLoading
+  IonTextarea, IonSearchbar, IonCardHeader, IonCardTitle, IonLoading, ToastController
 } from '@ionic/angular/standalone';
 import { DatabaseService } from 'src/app/services/database';
 import { Startup, Guest, Employee, Reason, Supplier, ThirdParty } from 'src/app/models/database.models';
 import { Observable, combineLatest, map, BehaviorSubject } from 'rxjs';
 import { addIcons } from 'ionicons';
-import { trashOutline, businessOutline, peopleOutline, logOutOutline, cloudUploadOutline, personAddOutline, createOutline, arrowBackOutline, saveOutline, settingsOutline, cartOutline, briefcaseOutline, listOutline, eyeOutline, codeSlashOutline, listCircleOutline, informationCircleOutline, openOutline, documentTextOutline } from 'ionicons/icons';
+import { trashOutline, businessOutline, peopleOutline, logOutOutline, cloudUploadOutline, personAddOutline, createOutline, arrowBackOutline, saveOutline, settingsOutline, cartOutline, briefcaseOutline, listOutline, eyeOutline, codeSlashOutline, listCircleOutline, informationCircleOutline, openOutline, documentTextOutline, closeOutline } from 'ionicons/icons';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 
 @Component({
@@ -74,6 +74,8 @@ export class BackofficePage {
   // -- OSPITI (Motivazioni) --
   newReasonText: string = '';
   reasons$ = this.dbService.getReasons();
+  editingReasonId: string | null = null;
+  editingReasonText: string = '';
 
   // -- FORNITORI --
   newSupplierName: string = '';
@@ -98,8 +100,8 @@ export class BackofficePage {
   newTpEmpRole: string = '';
   newTpEmpImage: string = '';
 
-  constructor() {
-    addIcons({peopleOutline,settingsOutline,businessOutline,cartOutline,briefcaseOutline,logOutOutline,cloudUploadOutline,arrowBackOutline,saveOutline,createOutline,trashOutline,documentTextOutline,informationCircleOutline,openOutline,listOutline,listCircleOutline,eyeOutline,codeSlashOutline,personAddOutline});
+  constructor(private toastController: ToastController) {
+    addIcons({peopleOutline,settingsOutline,businessOutline,cartOutline,briefcaseOutline,logOutOutline,cloudUploadOutline,arrowBackOutline,saveOutline,createOutline,trashOutline,documentTextOutline,informationCircleOutline,openOutline,listOutline,listCircleOutline,eyeOutline,codeSlashOutline,personAddOutline,closeOutline});
   // Carica il testo attuale all'avvio
     this.dbService.getAppConfig().subscribe(config => {
       // Se l'editor è pronto e il testo è diverso, aggiornalo.
@@ -316,6 +318,33 @@ async savePrivacyPdf() {
     if(confirm('Eliminare motivazione?')) this.dbService.deleteReason(id);
   }
 
+  startEditReason(reason: Reason) {
+    this.editingReasonId = reason.id || null;
+    this.editingReasonText = reason.text;
+  }
+
+  cancelEditReason() {
+    this.editingReasonId = null;
+    this.editingReasonText = '';
+  }
+
+  async saveReason() {
+    if (!this.editingReasonId) return;
+    const text = this.editingReasonText.trim();
+    if (!text) return;
+    await this.dbService.updateReason(this.editingReasonId, text);
+    this.showToast('Motivazione aggiornata', 'success');
+    this.cancelEditReason();
+  }
+
+  private showToast(message: string, color: 'success' | 'warning' | 'danger') {
+    this.toastController.create({
+      message,
+      duration: 2000,
+      color
+    }).then(toast => toast.present());
+  }
+
   // --- AZIONI FORNITORI ---
   // Crea Nuova
   async addSupplier() {
@@ -481,6 +510,9 @@ async savePrivacyPdf() {
   // 5. Rimuovi Logo Terze Parti
   removeThirdPartyLogo() {
     this.newThirdPartyLogo = '';
+    if (this.selectedThirdParty) {
+      this.selectedThirdParty.logoUrl = '';
+    }
   }
 
   // 6. Rimuovi Foto Dipendente Terze Parti
