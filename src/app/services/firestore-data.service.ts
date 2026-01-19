@@ -265,7 +265,13 @@ export class FirestoreDataService {
   }
 
   async updateThirdParty(id: string, data: Partial<ThirdParty>) {
-    return updateDoc(doc(this.firestore, 'third_parties', id), data);
+    const payload = Object.entries(data).reduce<Record<string, unknown>>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+    return updateDoc(doc(this.firestore, 'third_parties', id), payload);
   }
 
   async addEmployeeToThirdParty(tpId: string, employee: Employee) {
@@ -341,7 +347,7 @@ export class FirestoreDataService {
 
     const updatedEmployees = employees.map((e) => {
       if (e.name === oldEmp.name && e.role === oldEmp.role) {
-        return { ...newEmp, status: e.status, lastEntryTime: e.lastEntryTime };
+        return { ...newEmp, status: e.status || 'OUT', lastEntryTime: e.lastEntryTime || null };
       }
       return e;
     });
