@@ -134,6 +134,10 @@ export class DatabaseService {
     return this.dataService.deleteReason(id);
   }
 
+  updateReasonsOrder(reasons: Reason[]) {
+    return this.dataService.updateReasonsOrder(reasons);
+  }
+
   // ==========================================
   // GESTIONE FORNITORI
   // ==========================================

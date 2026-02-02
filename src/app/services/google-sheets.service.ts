@@ -29,7 +29,7 @@ export class GoogleSheetsService {
       data: {
         Data: dateStr,
         Dipendente: guest.name,
-        Motivazione: guest.reason,
+        Referente: guest.reason,
         Firma: guest.signatureUrl || 'N/A',
         Ora: timeStr,
       },
@@ -93,7 +93,7 @@ export class GoogleSheetsService {
         Data: dateStr,
         Dipendente: supplier.name,
         Firma: firmaBase64,
-        Motivazione: 'Fornitore',
+        Referente: 'Fornitore',
         Ora: timeStr,
       },
     };

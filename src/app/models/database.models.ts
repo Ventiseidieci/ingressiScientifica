@@ -32,6 +32,7 @@ export interface ActiveEmployeeResult {
 export interface Reason {
   id?: string;
   text: string;
+  order?: number;
 }
 
 export interface Supplier {

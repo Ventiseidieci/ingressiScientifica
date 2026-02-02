@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { collection, addDoc, setDoc, updateDoc, deleteDoc, doc, query, where, orderBy, onSnapshot, arrayUnion, getDoc } from '@angular/fire/firestore';
+import { collection, addDoc, setDoc, updateDoc, deleteDoc, doc, query, where, orderBy, onSnapshot, arrayUnion, getDoc, getDocs, limit, writeBatch } from '@angular/fire/firestore';
 import { Firestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -179,12 +179,21 @@ export class FirestoreDataService {
   // GESTIONE MOTIVAZIONI (Per Ospiti)
   // ==========================================
   getReasons(): Observable<Reason[]> {
-    const q = query(collection(this.firestore, 'reasons'), orderBy('text'));
+    const q = query(collection(this.firestore, 'reasons'));
     return this.getCollectionData<Reason>(q);
   }
 
   async addReason(text: string) {
-    return addDoc(collection(this.firestore, 'reasons'), { text });
+    const reasonsRef = collection(this.firestore, 'reasons');
+    const q = query(reasonsRef, orderBy('order', 'desc'), limit(1));
+    const snapshot = await getDocs(q);
+    let nextOrder = 0;
+    if (!snapshot.empty) {
+      const last = snapshot.docs[0].data() as Reason;
+      const lastOrder = typeof last.order === 'number' ? last.order : -1;
+      nextOrder = lastOrder + 1;
+    }
+    return addDoc(reasonsRef, { text, order: nextOrder });
   }
 
   async updateReason(id: string, text: string) {
@@ -193,6 +202,15 @@ export class FirestoreDataService {
 
   async deleteReason(id: string) {
     return deleteDoc(doc(this.firestore, 'reasons', id));
+  }
+
+  async updateReasonsOrder(reasons: Reason[]) {
+    const batch = writeBatch(this.firestore);
+    reasons.forEach((reason, index) => {
+      if (!reason.id) return;
+      batch.update(doc(this.firestore, 'reasons', reason.id), { order: index });
+    });
+    return batch.commit();
   }
 
   // ==========================================

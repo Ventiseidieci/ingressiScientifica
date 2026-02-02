@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -28,7 +28,10 @@ import {
   IonCardTitle,
   IonLoading,
   ToastController,
+  IonReorderGroup,
+  IonReorder,
 } from '@ionic/angular/standalone';
+import type { ItemReorderEventDetail } from '@ionic/angular';
 import { DatabaseService } from 'src/app/services/database';
 import {
   Startup,
@@ -38,7 +41,7 @@ import {
   Supplier,
   ThirdParty,
 } from 'src/app/models/database.models';
-import { Observable, combineLatest, map, BehaviorSubject } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
   trashOutline,
@@ -100,9 +103,11 @@ import {
     IonCardHeader,
     IonCardTitle,
     IonLoading,
+    IonReorderGroup,
+    IonReorder,
   ],
 })
-export class BackofficePage {
+export class BackofficePage implements OnInit, OnDestroy {
   private _privacyEditor: ElementRef | undefined;
   privacyUrl: string = '';
 
@@ -145,11 +150,13 @@ export class BackofficePage {
   activeGuests$ = this.dbService.getActiveGuests();
   activeEmployees$ = this.dbService.getAllActiveEmployees();
 
-  // -- OSPITI (Motivazioni) --
+  // -- OSPITI (Referenti) --
   newReasonText: string = '';
-  reasons$ = this.dbService.getReasons();
+  reasonsView: Reason[] = [];
   editingReasonId: string | null = null;
   editingReasonText: string = '';
+  private reasonsSub?: Subscription;
+  private reasonOrderInitialized: boolean = false;
 
   // -- FORNITORI --
   newSupplierName: string = '';
@@ -204,6 +211,39 @@ export class BackofficePage {
         this.privacyPdf = 'File attualmente online';
       }
     });
+  }
+
+  ngOnInit() {
+    this.reasonsSub = this.dbService.getReasons().subscribe((reasons) => {
+      const anyMissingOrder = reasons.some(
+        (reason) => typeof reason.order !== 'number',
+      );
+      const sorted = [...reasons].sort((a, b) => {
+        const orderA =
+          typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+        const orderB =
+          typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.text.localeCompare(b.text);
+      });
+      this.reasonsView = sorted;
+      if (
+        !this.reasonOrderInitialized &&
+        reasons.length > 0 &&
+        anyMissingOrder
+      ) {
+        this.reasonOrderInitialized = true;
+        const initialized = [...sorted];
+        initialized.forEach((reason, index) => {
+          reason.order = index;
+        });
+        void this.dbService.updateReasonsOrder(initialized);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.reasonsSub?.unsubscribe();
   }
 
   onFileSelected(event: any) {
@@ -435,13 +475,14 @@ export class BackofficePage {
 
   // --- AZIONI OSPITI (MOTIVAZIONI) ---
   async addReason() {
-    if (!this.newReasonText) return;
-    await this.dbService.addReason(this.newReasonText);
+    const text = this.newReasonText.trim();
+    if (!text) return;
+    await this.dbService.addReason(text);
     this.newReasonText = '';
   }
 
   async deleteReason(id: string) {
-    if (confirm('Eliminare motivazione?')) this.dbService.deleteReason(id);
+    if (confirm('Eliminare Referente?')) this.dbService.deleteReason(id);
   }
 
   startEditReason(reason: Reason) {
@@ -459,7 +500,7 @@ export class BackofficePage {
     const text = this.editingReasonText.trim();
     if (!text) return;
     await this.dbService.updateReason(this.editingReasonId, text);
-    this.showToast('Motivazione aggiornata', 'success');
+    this.showToast('Referente aggiornato', 'success');
     this.cancelEditReason();
   }
 
@@ -471,6 +512,26 @@ export class BackofficePage {
         color,
       })
       .then((toast) => toast.present());
+  }
+
+  async reorderReasons(event: CustomEvent<ItemReorderEventDetail>) {
+    const from = event.detail.from;
+    const to = event.detail.to;
+    if (from === to) {
+      event.detail.complete();
+      return;
+    }
+    const [moved] = this.reasonsView.splice(from, 1);
+    this.reasonsView.splice(to, 0, moved);
+    this.reasonsView.forEach((reason, index) => {
+      reason.order = index;
+    });
+    event.detail.complete();
+    await this.dbService.updateReasonsOrder(this.reasonsView);
+  }
+
+  trackReason(_index: number, reason: Reason) {
+    return reason.id ?? reason.text;
   }
 
   // --- AZIONI FORNITORI ---
