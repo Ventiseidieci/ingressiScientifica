@@ -27,6 +27,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
   // Dati Utente
   guestName: string = '';
   selectedReason: string = '';
+  otherReferent: string = '';
   signatureImage: string | null = null; // Qui è da la firma in base64
 
   // Opzioni Menu a Tendina
@@ -135,6 +136,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     if (view === 'guestsData') { 
       this.guestName = '';
       this.selectedReason = '';
+      this.otherReferent = '';
       this.signatureImage = null;
     }
     if (view == 'guestsExit'){
@@ -694,7 +696,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     const newGuest: Guest = {
       // id: this.dbService.generateId(), // Genera un ID unico per l'ospite
       name: this.guestName,
-      reason: this.selectedReason,
+      reason: this.selectedReason === 'Altro' ? this.otherReferent.trim() : this.selectedReason,
       entryTime: new Date().toISOString(),
       status: 'IN',
       signatureUrl: this.signatureImage || '' // <--- SALVA LA FIRMA QUI

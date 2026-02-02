@@ -186,11 +186,19 @@
             </ion-item>
 
             <ion-item class="custom-input">
-              <ion-select label="Motivazione Ingresso" labelPlacement="floating" [(ngModel)]="selectedReason" interface="popover">
+              <ion-select label="Referente" labelPlacement="floating" [(ngModel)]="selectedReason" interface="popover">
                 <ion-select-option *ngFor="let reason of reasons$ | async" [value]="reason.text">
                   {{ reason.text }}
                 </ion-select-option>
               </ion-select>
+            </ion-item>
+
+            <ion-item class="custom-input" *ngIf="selectedReason === 'Altro'">
+              <ion-input
+                label="Specifica referente"
+                labelPlacement="floating"
+                [(ngModel)]="otherReferent">
+              </ion-input>
             </ion-item>
 
             <div class="signature-trigger" (click)="openPrivacyModal()">
@@ -203,7 +211,11 @@
               </div>
             </div>
 
-            <ion-button expand="block" class="submit-btn" [disabled]="!signatureImage || !guestName" (click)="acceptAndSign()">
+            <ion-button
+              expand="block"
+              class="submit-btn"
+              [disabled]="!signatureImage || !guestName || !selectedReason || (selectedReason === 'altro' && !otherReferent)"
+              (click)="acceptAndSign()">
               Conferma Ingresso
             </ion-button>
             
