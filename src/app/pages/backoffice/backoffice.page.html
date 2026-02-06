@@ -4,7 +4,7 @@
   </ion-toolbar>
   
   <ion-toolbar>
-    <ion-segment [(ngModel)]="selectedSegment">
+    <ion-segment [(ngModel)]="selectedSegment" (ionChange)="onSegmentChange()">
       <ion-segment-button value="presenze">
         <ion-icon name="people-outline"></ion-icon>
         <ion-label>Persone in Sede</ion-label>

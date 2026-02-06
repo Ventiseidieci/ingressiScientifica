@@ -1,7 +1,7 @@
 import { addIcons } from 'ionicons';
 import { create, checkmarkCircle, refreshOutline, linkOutline, documentTextOutline, alertCircleOutline, arrowBackOutline } from 'ionicons/icons';
 import { ActiveEmployeeResult } from './../../services/database';
-import { Component, ElementRef, OnDestroy, AfterViewInit, ViewChild, Renderer2, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, AfterViewInit, ViewChild, ViewChildren, QueryList, Renderer2, inject } from '@angular/core';
 import { IonContent, IonSelect, IonCheckbox, ToastController, IonButton, IonSelectOption, IonRow, IonGrid, IonCol, IonCard, IonCardTitle, IonCardContent, IonInput, IonCardHeader, IonItem, IonIcon, IonModal, IonToolbar, IonHeader, IonTitle, IonButtons, IonFooter, IonAvatar, IonBadge, IonLabel, IonList,IonSearchbar } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -23,6 +23,8 @@ type HomeView = 'main' | 'guestsHome' | 'fornitoriHome' | 'thirdParties' | 'thir
 export class HomePage implements AfterViewInit, OnDestroy {
   @ViewChild('backgroundCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('signatureCanvas') signatureCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild(IonContent) content?: IonContent;
+  @ViewChildren('viewScroll', { read: ElementRef }) viewScrollContainers?: QueryList<ElementRef<HTMLElement>>;
 
   // Dati Utente
   guestName: string = '';
@@ -147,6 +149,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
       this.activeSuppliers$ = this.dbService.getActiveSuppliers();
     }
     this.currentView = view;
+    this.resetScroll();
   }
 
   goBack() {
@@ -154,6 +157,15 @@ export class HomePage implements AfterViewInit, OnDestroy {
     if (previousView) {
       this.setView(previousView, false);
     }
+  }
+
+  private resetScroll() {
+    setTimeout(() => {
+      this.content?.scrollToTop(0);
+      this.viewScrollContainers?.forEach((ref) => {
+        ref.nativeElement.scrollTop = 0;
+      });
+    }, 0);
   }
 
   constructor(
@@ -712,6 +724,10 @@ export class HomePage implements AfterViewInit, OnDestroy {
     try {
       if(await this.dbService.checkInGuest(newGuest)){
         this.showToast(`Benvenuto ${this.guestName}`, 'success');
+        this.checkConsense1 = false;
+        this.checkConsense2 = false;
+        this.hasSigned = false;
+        this.clearSignature();
       } else{
         this.showToast(`Errore durante il check-in, contattare amministratore`, 'danger');
 

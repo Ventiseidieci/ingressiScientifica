@@ -30,6 +30,7 @@ export class BackofficePage {
 
   private _privacyEditor: ElementRef | undefined;
   privacyUrl: string = '';
+  @ViewChild(IonContent) content?: IonContent;
   
 
   // deprecato
@@ -106,6 +107,10 @@ export class BackofficePage {
         this.privacyPdf = "File attualmente online"
       }
     });
+  }
+
+  onSegmentChange() {
+    setTimeout(() => this.content?.scrollToTop(0), 0);
   }
 
   onFileSelected(event: any) {

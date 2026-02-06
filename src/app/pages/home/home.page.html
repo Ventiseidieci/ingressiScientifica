@@ -40,7 +40,7 @@
 
   <!-- SCELTA STARTUP -->
   <div class="menu-wrapper" [class.active]="currentView === 'startup'">
-    <div class="vertical-scroll-container">
+    <div class="vertical-scroll-container" #viewScroll>
       <ion-grid class="center-grid">
         <ion-row class="startup-row">
           @for (s of startup$ | async; track s.id) {
@@ -87,7 +87,7 @@
         </ion-row>
       </ion-card-header>
 
-      <ion-card-content>
+      <ion-card-content #viewScroll>
         <ng-container *ngIf="ActiveEmployeeResult$ | async as ActiveEmployeeResult">
           <ion-grid>
             
@@ -279,7 +279,7 @@
   </div>
   <!-- ACCESSO FORNITORI -->
   <div class="menu-wrapper" [class.active]="currentView === 'fornitoriAccess'">
-    <div class="vertical-scroll-container">
+    <div class="vertical-scroll-container" #viewScroll>
       <ion-grid class="center-grid">
         <ion-row class="startup-row">
           @for (sup of supplier$ | async; track sup.id) {
@@ -325,7 +325,7 @@
 
       </ion-card-header>
 
-      <ion-card-content>
+      <ion-card-content #viewScroll>
         <ion-list>
           @for (sup of filteredSuppliers$ | async; track sup.id) {
             <ion-item>
@@ -352,7 +352,7 @@
   </div>
   <!-- DIPENDENT UTENTI TERZI -->
   <div class="menu-wrapper" [class.active]="currentView === 'thirdParties'">
-    <div class="vertical-scroll-container">
+    <div class="vertical-scroll-container" #viewScroll>
       <ion-grid class="center-grid">
         <ion-row class="startup-row">
           @for (tp of thirdPartie$ | async; track tp.id) {
