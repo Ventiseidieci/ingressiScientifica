@@ -56,6 +56,7 @@ export interface ActiveEmployeeResult {
 export interface Reason {
   id?: string;
   text: string;
+  order?: number;
 }
 
 // Per "Fornitori"
@@ -443,7 +444,13 @@ export class DatabaseService {
   // ==========================================
   getReasons(): Observable<Reason[]> {
     const q = query(collection(this.firestore, 'reasons'), orderBy('text'));
-    return this.getCollectionData<Reason>(q);
+    return this.getCollectionData<Reason>(q).pipe(
+      map((reasons) =>
+        reasons
+          .slice()
+          .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER))
+      )
+    );
   }
   async addReason(text: string) {
     return addDoc(collection(this.firestore, 'reasons'), { text });

@@ -45,6 +45,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   checkConsense1: boolean = false; // "Dichiaro di aver letto..."
   checkConsense2: boolean = false; // "Accetto il trattamento..."
+  private privacyAccepted = false;
   hasSigned: boolean = false;
   // Variabili per il disegno
   private signaturePadElement: any;
@@ -584,20 +585,26 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   // --- LOGICA MODALE E FIRMA ---
   openPrivacyModal() {
+    this.privacyAccepted = false;
     this.isPrivacyModalOpen = true;
   }
 
   closePrivacyModal() {
     this.isPrivacyModalOpen = false;
     this.isDrawing = false;
-    if (!this.signatureImage) {
+    if (!this.privacyAccepted) {
+      this.checkConsense1 = false;
+      this.checkConsense2 = false;
+      this.hasSigned = false;
       this.clearSignature();
     }
+    this.privacyAccepted = false;
   }
 
   confirmPrivacyModal() {
     if (this.canProceed && this.signaturePadElement) {
       this.signatureImage = this.signaturePadElement.toDataURL(); // Ottieni Base64
+      this.privacyAccepted = true;
     }
     this.isPrivacyModalOpen = false;
     this.isDrawing = false;
