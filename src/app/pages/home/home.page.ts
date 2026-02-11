@@ -25,6 +25,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
   @ViewChild('signatureCanvas') signatureCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild(IonContent) content?: IonContent;
   @ViewChildren('viewScroll', { read: ElementRef }) viewScrollContainers?: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('horizontalViewScroll', { read: ElementRef }) horizontalViewScrollContainers?: QueryList<ElementRef<HTMLElement>>;
 
   // Dati Utente
   guestName: string = '';
@@ -164,6 +165,9 @@ export class HomePage implements AfterViewInit, OnDestroy {
       this.content?.scrollToTop(0);
       this.viewScrollContainers?.forEach((ref) => {
         ref.nativeElement.scrollTop = 0;
+      });
+      this.horizontalViewScrollContainers?.forEach((ref) => {
+        ref.nativeElement.scrollLeft = 0;
       });
     }, 0);
   }
@@ -707,7 +711,33 @@ export class HomePage implements AfterViewInit, OnDestroy {
     this.hasSigned = false;
   }
 
+  private toTitleCaseWords(value: string): string {
+    return value
+      .trim()
+      .replace(/\s+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  private toLiveTitleCaseWords(value: string): string {
+    return value
+      .toLowerCase()
+      .replace(/(^|\s)([^\s])/g, (_, separator: string, char: string) => `${separator}${char.toUpperCase()}`);
+  }
+
+  formatGuestNameLive(value: string) {
+    this.guestName = this.toLiveTitleCaseWords(value ?? '');
+  }
+
+  formatGuestName() {
+    this.guestName = this.toTitleCaseWords(this.guestName);
+  }
+
   async acceptAndSign() {
+    this.formatGuestName();
+
     if (!this.signatureImage && this.signaturePadElement && this.hasSigned) {
       this.signatureImage = this.signaturePadElement.toDataURL(); // Ottieni Base64
     }
