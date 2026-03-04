@@ -82,6 +82,7 @@
             placeholder="Cerca collega..." 
             animated="true"
             debounce="300"
+            [value]="employeeSearchTerm"
             (ionInput)="handleEmployeeSearch($event)">
           </ion-searchbar>
         </ion-row>
@@ -93,7 +94,7 @@
             
             <div *ngIf="employeesOut.length > 0">
               <h3 style="margin-left: 10px; color: var(--ion-color-medium);">Da Registrare</h3>
-              <ion-row class="employees-row" #horizontalViewScroll>
+              <ion-row class="employees-row employees-row-horizontal" #horizontalViewScroll>
                 @for (emp of employeesOut; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 
@@ -120,7 +121,7 @@
 
             <div *ngIf="employeesIn.length > 0">
               <h3 style="margin-left: 10px; margin-top: 20px; color: var(--ion-color-success);">Presenti in Sede</h3>
-              <ion-row class="employees-row" #horizontalViewScroll>
+              <ion-row class="employees-row employees-row-vertical">
                 @for (emp of employeesIn; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 
@@ -392,6 +393,7 @@
             placeholder="Cerca dipendente..." 
             animated="true"
             debounce="300"
+            [value]="employeeSearchTerm"
             (ionInput)="handleTpEmployeeSearch($event)">
           </ion-searchbar>
         </ion-row>
@@ -403,7 +405,7 @@
 
             <div *ngIf="tpEmployeesOut.length > 0">
               <h3 style="margin-left: 10px; color: var(--ion-color-medium);">Da Registrare</h3>
-              <ion-row class="employees-row">
+              <ion-row class="employees-row employees-row-horizontal">
                 @for (emp of tpEmployeesOut; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 
@@ -430,12 +432,12 @@
                 </div>
                 <div *ngIf="tpEmployeesIn.length > 0">
                     <h3 style="margin-left: 10px; margin-top: 20px; color: var(--ion-color-success);">Presenti in Sede</h3>
-                  <ion-row>
+                  <ion-row class="employees-row employees-row-vertical">
                     @for (emp of tpEmployeesIn; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 
                       class="employee-badge is-present" 
-                      (click)="toggleEmployeeEntry(emp)">
+                      (click)="toggleTpEmployee(emp)">
                       
                       <ion-avatar class="emp-avatar">
                         <img [src]="emp.imageUrl || 'https://ionicframework.com/docs/img/demos/avatar.svg'" loading="lazy" />

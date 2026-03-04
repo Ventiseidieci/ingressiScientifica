@@ -132,6 +132,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   setView(view: HomeView, pushHistory: boolean = true) {
     if (view === this.currentView) return;
+    const previousView = this.currentView;
     if (view === 'main') {
       this.viewHistory = [];
     } else if (pushHistory) {
@@ -149,6 +150,13 @@ export class HomePage implements AfterViewInit, OnDestroy {
     if (view == 'fornitoriExit'){
       this.activeSuppliers$ = this.dbService.getActiveSuppliers();
     }
+
+    const leavingEmployeeViews = previousView === 'startupEmployees' || previousView === 'thirdPartyEmployees';
+    const enteringEmployeeViews = view === 'startupEmployees' || view === 'thirdPartyEmployees';
+    if (leavingEmployeeViews || enteringEmployeeViews) {
+      this.employeeSearchTerm = '';
+    }
+
     this.currentView = view;
     this.resetScroll();
   }
