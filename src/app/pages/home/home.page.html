@@ -69,7 +69,7 @@
 
 <!-- STARTUP EMPLOYEES -->
   <div class="menu-wrapper" [class.active]="currentView === 'startupEmployees'">
-    <ion-card class="input-card" style="max-width: 800px;">
+    <ion-card class="input-card">
       <ion-card-header>
         <ion-row>
           <ion-button fill="clear" (click)="setView('startup')" color="medium" expand="block">
@@ -121,7 +121,7 @@
 
             <div *ngIf="employeesIn.length > 0">
               <h3 style="margin-left: 10px; margin-top: 20px; color: var(--ion-color-success);">Presenti in Sede</h3>
-              <ion-row class="employees-row employees-row-vertical">
+              <ion-row class="employees-row employees-row-horizontal">
                 @for (emp of employeesIn; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 
@@ -380,7 +380,7 @@
     </div>
   </div>
   <div class="menu-wrapper" [class.active]="currentView === 'thirdPartyEmployees'">
-    <ion-card class="input-card" style="max-width: 100%;">
+    <ion-card class="input-card">
       <ion-card-header>
         <ion-row>
           <ion-button fill="clear" (click)="setView('thirdParties')" color="medium" expand="block">
@@ -432,7 +432,7 @@
                 </div>
                 <div *ngIf="tpEmployeesIn.length > 0">
                     <h3 style="margin-left: 10px; margin-top: 20px; color: var(--ion-color-success);">Presenti in Sede</h3>
-                  <ion-row class="employees-row employees-row-vertical">
+                  <ion-row class="employees-row employees-row-horizontal">
                     @for (emp of tpEmployeesIn; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 
