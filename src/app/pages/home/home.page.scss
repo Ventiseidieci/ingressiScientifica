@@ -41,18 +41,20 @@ ion-content {
 /* ========================================================= */
 
 .box-header{
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 8px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   height: auto;
-  padding-top: 24px;
-  padding-bottom: 24px;
-  padding-inline: 16px;
+  min-height: 52px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-inline: 12px;
 
   position: relative;
   z-index: 10;
+  pointer-events: none;
 }
 .back-button{
   display: flex;
@@ -62,6 +64,7 @@ ion-content {
   --padding-end: 6px;
   --padding-top: 6px;
   --padding-bottom: 6px;
+  pointer-events: auto;
   .back-text{
     margin-top: 3px;
   }
@@ -134,6 +137,19 @@ ion-content {
   animation: slideInCard 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.menu-wrapper .input-card .back-icon-only-btn {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  min-width: 36px;
+  min-height: 36px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  align-self: center;
+}
+
 /* Animazione dedicata per farla sembrare un foglio che sale */
 @keyframes slideInCard {
   from { opacity: 0; transform: translateY(30px); }
@@ -142,7 +158,12 @@ ion-content {
 
 .logo img{
   height: auto;
-  max-height: 60px;
+  max-height: 44px;
+}
+
+.logo {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 // .center-grid{

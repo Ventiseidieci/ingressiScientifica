@@ -3,11 +3,11 @@
   <canvas #backgroundCanvas class="background-canvas"></canvas>
 
   <!-- HEADER -->
-  <div class="box-header" (click)="setView('main')">
-    <div class="logo" data-maxheight="60">
+  <div class="box-header">
+    <div class="logo" data-maxheight="60" (click)="setView('main')">
       <img fetchpriority="high" decoding="async" src="https://scientifica.vc/wp-content/uploads/2025/05/Favicon-Scientifica_Positive.png" alt="logo" class="img-responsive" data-cmp-info="10">
     </div>
-    <ion-button *ngIf="canGoBack" fill="clear" class="back-button" (click)="goBack(); $event.stopPropagation()">
+    <ion-button *ngIf="showHeaderBackButton" fill="clear" class="back-button" (click)="goBack()">
       <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
       <span class="back-text"> INDIETRO</span>
     </ion-button>
@@ -72,7 +72,7 @@
     <ion-card class="input-card">
       <ion-card-header>
         <ion-row>
-          <ion-button fill="clear" (click)="setView('startup')" color="medium" expand="block">
+          <ion-button fill="clear" (click)="setView('startup')" color="medium" class="back-icon-only-btn">
             <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
           </ion-button>
           <ion-card-title>
@@ -121,7 +121,7 @@
 
             <div *ngIf="employeesIn.length > 0">
               <h3 style="margin-left: 10px; margin-top: 20px; color: var(--ion-color-success);">Presenti in Sede</h3>
-              <ion-row class="employees-row employees-row-horizontal">
+              <ion-row class="employees-row employees-row-horizontal" #horizontalViewScroll>
                 @for (emp of employeesIn; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 
@@ -178,7 +178,12 @@
   <div class="menu-wrapper" [class.active]="currentView === 'guestsData'">
     <ion-card class="input-card">
           <ion-card-header>
-            <ion-card-title>Registrazione Ospite</ion-card-title>
+            <ion-row>
+              <ion-button fill="clear" (click)="goBack()" color="medium" class="back-icon-only-btn">
+                <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-card-title>Registrazione Ospite</ion-card-title>
+            </ion-row>
           </ion-card-header>
           
           <ion-card-content>
@@ -383,7 +388,7 @@
     <ion-card class="input-card">
       <ion-card-header>
         <ion-row>
-          <ion-button fill="clear" (click)="setView('thirdParties')" color="medium" expand="block">
+          <ion-button fill="clear" (click)="setView('thirdParties')" color="medium" class="back-icon-only-btn">
             <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
           </ion-button>
           <ion-card-title>
@@ -405,7 +410,7 @@
 
             <div *ngIf="tpEmployeesOut.length > 0">
               <h3 style="margin-left: 10px; color: var(--ion-color-medium);">Da Registrare</h3>
-              <ion-row class="employees-row employees-row-horizontal">
+              <ion-row class="employees-row employees-row-horizontal" #horizontalViewScroll>
                 @for (emp of tpEmployeesOut; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 
@@ -432,7 +437,7 @@
                 </div>
                 <div *ngIf="tpEmployeesIn.length > 0">
                     <h3 style="margin-left: 10px; margin-top: 20px; color: var(--ion-color-success);">Presenti in Sede</h3>
-                  <ion-row class="employees-row employees-row-horizontal">
+                  <ion-row class="employees-row employees-row-horizontal" #horizontalViewScroll>
                     @for (emp of tpEmployeesIn; track emp.name) {
                   <ion-col size="6" size-sm="4">
                     <div 

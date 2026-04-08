@@ -124,20 +124,44 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   // GESTIONE VISTE 
   currentView: HomeView = 'main';
-  private viewHistory: HomeView[] = [];
 
-  get canGoBack(): boolean {
-    return this.viewHistory.length > 0;
+  private getNativePreviousView(view: HomeView): HomeView | null {
+    const nativePreviousMap: Partial<Record<HomeView, HomeView>> = {
+      startup: 'main',
+      startupEmployees: 'startup',
+      thirdParties: 'main',
+      thirdPartyEmployees: 'thirdParties',
+      guestsHome: 'main',
+      guestsData: 'guestsHome',
+      guestsExit: 'guestsHome',
+      fornitoriHome: 'main',
+      fornitoriAccess: 'fornitoriHome',
+      fornitoriExit: 'fornitoriHome',
+      fornitori: 'main',
+      startupChoice: 'main',
+      startupAccess: 'startupChoice',
+      startupExit: 'startupChoice',
+      utenti3: 'main',
+      exolab: 'main',
+      loto: 'main',
+      libera: 'main',
+    };
+
+    return nativePreviousMap[view] ?? null;
   }
 
-  setView(view: HomeView, pushHistory: boolean = true) {
+  get canGoBack(): boolean {
+    return this.getNativePreviousView(this.currentView) !== null;
+  }
+
+  get showHeaderBackButton(): boolean {
+    const inputCardViews: HomeView[] = ['startupEmployees', 'guestsData', 'thirdPartyEmployees'];
+    return this.canGoBack && !inputCardViews.includes(this.currentView);
+  }
+
+  setView(view: HomeView) {
     if (view === this.currentView) return;
     const previousView = this.currentView;
-    if (view === 'main') {
-      this.viewHistory = [];
-    } else if (pushHistory) {
-      this.viewHistory.push(this.currentView);
-    }
     if (view === 'guestsData') { 
       this.guestName = '';
       this.selectedReason = '';
@@ -162,9 +186,9 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
   goBack() {
-    const previousView = this.viewHistory.pop();
+    const previousView = this.getNativePreviousView(this.currentView);
     if (previousView) {
-      this.setView(previousView, false);
+      this.setView(previousView);
     }
   }
 
@@ -266,12 +290,12 @@ export class HomePage implements AfterViewInit, OnDestroy {
     const isCurrentlyIn = employee.status === 'IN';
 
     const message = isCurrentlyIn 
-      ? `Arrivederci ${employee.name}` 
-      : `Benvenuto ${employee.name}`;
+      ? `ARRIVEDERCI ${employee.name}` 
+      : `BENVENUTO ${employee.name}`;
     const color = isCurrentlyIn ? 'warning' : 'success';
 
       this.showToast(message, color);
-      setTimeout(() => this.setView('main'), 350);
+      setTimeout(() => this.setView('main'), 700);
   }
 
   get filteredEmployees(): Employee[] {
