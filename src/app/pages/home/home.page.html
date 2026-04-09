@@ -240,6 +240,7 @@
           placeholder="Cerca ospite..." 
           animated="true"
           debounce="300"
+          [value]="guestSearchTerm"
           (ionInput)="handleSearch($event)">
         </ion-searchbar>
 
@@ -326,6 +327,7 @@
           placeholder="Cerca fornitore..." 
           animated="true"
           debounce="300"
+          [value]="supplierSearchTerm"
           (ionInput)="handleSupplierSearch($event)">
         </ion-searchbar>
 

@@ -162,6 +162,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
   setView(view: HomeView) {
     if (view === this.currentView) return;
     const previousView = this.currentView;
+    this.clearAllSearchTerms();
     if (view === 'guestsData') { 
       this.guestName = '';
       this.selectedReason = '';
@@ -228,6 +229,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
   ActiveEmployeeResult$ = this.dbService.getAllActiveEmployees();
   activeTpEmployeeResult$ = this.dbService.getAllActiveThirdPartyEmployees();
   searchTerm$= new BehaviorSubject<string>('');
+  guestSearchTerm: string = '';
   startup$:Observable<Startup[]> = this.dbService.getStartups().pipe(
     tap(updatedStartups => {
       if (this.selectedStartup) {
@@ -245,6 +247,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
   selectedSupplier: Supplier | null = null;
   activeSuppliers$ = this.dbService.getActiveSuppliers();
   supplierSearchTerm$ = new BehaviorSubject<string>('') ;
+  supplierSearchTerm: string = '';
 
   // var terze parti
   thirdPartie$ = this.dbService.getThirdParties();
@@ -295,7 +298,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     const color = isCurrentlyIn ? 'warning' : 'success';
 
       this.showToast(message, color);
-      setTimeout(() => this.setView('main'), 700);
+      setTimeout(() => this.setView('main'), 750);
   }
 
   get filteredEmployees(): Employee[] {
@@ -345,14 +348,15 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
   handleSupplierSearch(event: any) {
-    this.supplierSearchTerm$.next(event.detail.value || '');
+    this.supplierSearchTerm = event.detail.value || '';
+    this.supplierSearchTerm$.next(this.supplierSearchTerm);
   }
 
   doSupplierCheckout(supplier: Supplier) {
     this.dbService.updateSupplierStatus(supplier);
     // this.dbService.checkOutSupplier(supplier);
     setTimeout(() => {
-      this.showToast(`Arrivederci ${supplier.name}`, 'warning');
+      this.showToast(`ARRIVEDERCI ${supplier.name}`, 'warning');
       this.setView('main');
     }, 350);
   }
@@ -407,12 +411,12 @@ export class HomePage implements AfterViewInit, OnDestroy {
     const isCurrentlyIn = employee.status === 'IN';
 
     const message = isCurrentlyIn 
-      ? `Arrivederci ${employee.name}` 
-      : `Benvenuto ${employee.name}`;
+      ? `ARRIVEDERCI ${employee.name}` 
+      : `BENVENUTO ${employee.name}`;
     const color = isCurrentlyIn ? 'warning' : 'success';
 
       this.showToast(message, color);
-      setTimeout(() => this.setView('main'), 350);
+      setTimeout(() => this.setView('main'), 750);
   }
   // UTILITY
   showToast(message: string, color: 'success' | 'warning' | 'danger') {
@@ -471,7 +475,16 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
   handleSearch(event: any) {
-    this.searchTerm$.next(event.detail.value || '');
+    this.guestSearchTerm = event.detail.value || '';
+    this.searchTerm$.next(this.guestSearchTerm);
+  }
+
+  private clearAllSearchTerms() {
+    this.employeeSearchTerm = '';
+    this.guestSearchTerm = '';
+    this.supplierSearchTerm = '';
+    this.searchTerm$.next('');
+    this.supplierSearchTerm$.next('');
   }
 
   private createShader(type: number, source: string): WebGLShader | null {
