@@ -164,10 +164,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     const previousView = this.currentView;
     this.clearAllSearchTerms();
     if (view === 'guestsData') { 
-      this.guestName = '';
-      this.selectedReason = '';
-      this.otherReferent = '';
-      this.signatureImage = null;
+      this.resetGuestForm();
     }
     if (view == 'guestsExit'){
       this.activeGuests$ = this.dbService.getActiveGuests();
@@ -693,10 +690,15 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   // RESET (Quando si chiude il modale o si finisce)
   resetGuestForm() {
-    // ... tua logica esistente ...
+    this.guestName = '';
+    this.selectedReason = '';
+    this.otherReferent = '';
+    this.signatureImage = null;
     this.checkConsense1 = false;
     this.checkConsense2 = false;
     this.hasSigned = false;
+    this.privacyAccepted = false;
+    this.isDrawing = false;
     this.clearSignature();
   }
 
@@ -795,20 +797,18 @@ export class HomePage implements AfterViewInit, OnDestroy {
       status: 'IN',
       signatureUrl: this.signatureImage || '' // <--- SALVA LA FIRMA QUI
     };
-    this.setView('main')
-    try {
-      if(await this.dbService.checkInGuest(newGuest)){
-        this.showToast(`Benvenuto ${this.guestName}`, 'success');
-        this.checkConsense1 = false;
-        this.checkConsense2 = false;
-        this.hasSigned = false;
-        this.clearSignature();
-      } else{
-        this.showToast(`Errore durante il check-in, contattare amministratore`, 'danger');
 
-      }; // Usa il metodo aggiornato
+    try {
+      if (await this.dbService.checkInGuest(newGuest)) {
+        this.showToast(`Benvenuto ${this.guestName}`, 'success');
+        this.resetGuestForm();
+        this.setView('main');
+      } else {
+        this.showToast(`Errore durante il check-in, contattare amministratore`, 'danger');
+      }
     } catch (err) {
       console.error(err);
+      this.showToast(`Errore durante il check-in, contattare amministratore`, 'danger');
     }
   }
 

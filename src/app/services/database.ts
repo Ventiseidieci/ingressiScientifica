@@ -189,17 +189,23 @@ export class DatabaseService {
   async checkInGuest(guest: Guest) {
     try {
       const guestsRef = collection(this.firestore, 'guests');
-      const docRef = addDoc(guestsRef, {
+      await addDoc(guestsRef, {
         ...guest,
         entryTime: new Date().toISOString(),
         status: 'IN'
       });
       console.log('Salvato su Firebase!');
-      await lastValueFrom(this.logGuestActionToSheet(guest, "INGRESSO"))
-      console.log('Logsheet INGRESSO inviato con successo');
+
+      try {
+        await lastValueFrom(this.logGuestActionToSheet(guest, "INGRESSO"));
+        console.log('Logsheet INGRESSO inviato con successo');
+      } catch (logError) {
+        console.error('Errore logsheet ingresso ospite:', logError);
+      }
+
       return true;
     } catch (error) {
-      console.log('Errore logsheet, contattare amministratore', error);
+      console.log('Errore durante il check-in ospite', error);
       return false;
     }
   }
