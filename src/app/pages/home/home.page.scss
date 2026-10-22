@@ -41,7 +41,7 @@ ion-content {
 /* ========================================================= */
 
 .box-header{
-  margin-top: 8px;
+  margin-top: 38px;
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -50,7 +50,7 @@ ion-content {
   min-height: 52px;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-inline: 12px;
+  padding-inline: 30px;
 
   position: relative;
   z-index: 10;
@@ -158,12 +158,25 @@ ion-content {
 
 .logo img{
   height: auto;
-  max-height: 44px;
+  max-height: 55px;
 }
 
 .logo {
   pointer-events: auto;
   cursor: pointer;
+}
+
+/* In landscape on tablets, keep the mark clear of the device's top edge. */
+@media (min-width: 768px) and (orientation: landscape) and (max-height: 700px) {
+  .box-header {
+    margin-top: 0;
+    padding-top: max(20px, env(safe-area-inset-top));
+    min-height: 68px;
+  }
+
+  .logo img {
+    max-height: 56px;
+  }
 }
 
 // .center-grid{
